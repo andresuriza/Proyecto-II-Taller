@@ -5,11 +5,7 @@ from tkinter import *
 # Curso: Taller de programacion
 # Programadores: Andrés Uriza Lazo y Jose Pablo Esquetini Fallas
 """
-
-
 #----------------------------------------------------------------------Nivel 1-------------------------------------------------------------------------------------------
-
-
 def level_1():  # Inicia el nivel 1, con dificultad facil
     global avatar
     
@@ -31,10 +27,7 @@ def level_1():  # Inicia el nivel 1, con dificultad facil
 
 
     #class Missile():
-    #    def __init__(self):
-       
-
-
+    #    def __init__(self):   
 #-------------------------------------------------------------------Menu principal---------------------------------------------------------------------------------------
 menu_window = Tk()
 menu_window.title("Juego") # Pendiente definir nombre
