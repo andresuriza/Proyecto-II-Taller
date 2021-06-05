@@ -32,36 +32,42 @@ def level_1():  # Inicia el nivel 1, con dificultad facil
         def __init__(self):
             self.avatar_pic = background.create_image(600, 300, image=avatar)
 
-        def left(self, key): # Mueve la nave a la izquierda
+        def left(self, key): # Mueve al avatar a la izquierda
            if background.coords(self.avatar_pic)[0] > 380:
                 background.move(self.avatar_pic, -30, 0)
 
-        def right(self, key): # Mueve la nave a la derecha
+        def right(self, key): # Mueve al avatar a la derecha
            if background.coords(self.avatar_pic)[0] < 1130:
                 background.move(self.avatar_pic, 30, 0)
 
-        def up(self, key): # Mueve la nave hacia arriba
+        def up(self, key): # Mueve al avatar hacia arriba
            if background.coords(self.avatar_pic)[1] > 70:
                 background.move(self.avatar_pic, 0, -30)
 
-        def down(self, key): # Mueve la nave hacia abajo
+        def down(self, key): # Mueve al avatar hacia abajo
            if background.coords(self.avatar_pic)[1] < 520:
                 background.move(self.avatar_pic, 0, 30)
 
     class Obstacle():
-        def __init__(self, x_speed, y_speed):
-            self.obstacle_pic = background.create_image(600, 300, image=obstacle)
+        def __init__(self, x_pos, y_pos, x_speed, y_speed):
+            self.counter = 0
+            self.obstacle_pic = background.create_image(x_pos, y_pos, image=obstacle)
             self.x_speed = x_speed
             self.y_speed = y_speed
 
-        def animate(self):  # Mueve al jefe 1 constantemente de manera horizontal
+        def animate(self): # Mueve a los proyectiles
             x = background.coords(self.obstacle_pic)[0]
             y = background.coords(self.obstacle_pic)[1]
 
-            if x >= 1180 or x <= 300:
-                self.x_speed = -self.x_speed
-            if y >= 540 or y <= 50:
-                self.y_speed = -self.y_speed
+            if self.counter == 2:
+                self.obstacle_pic.destroy()
+            else:
+                if x >= 1180 or x <= 300:
+                    self.counter += 1
+                    self.x_speed = -self.x_speed
+                if y >= 540 or y <= 50:
+                    self.counter += 1
+                    self.y_speed = -self.y_speed
             background.move(self.obstacle_pic, self.x_speed, self.y_speed)
             background.after(10, self.animate)
 
@@ -74,7 +80,7 @@ def level_1():  # Inicia el nivel 1, con dificultad facil
     
     def create():
         if counter() % 2 == 0:
-            proyectile = Obstacle(random.randint(5, 7), random.randint(5, 7))
+            proyectile = Obstacle(random.randint(300, 1180), random.randint(50, 540), random.randint(-5, 5), random.randint(-5, 5))
             proyectile.animate()
         background.after(1000, create)
 
