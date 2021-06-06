@@ -1,28 +1,130 @@
+"""
+- Programadores: Jose Pablo Esquetini Fallas - 2021035767 y Andrés Uriza Lazo - 2021466844
+- Projecto II
+- Taller de programacion - CE1102
+- Fecha de creacion: 04/06/2021
+- Ultima modificacion: 05/06/2021
+"""
+
+# Libraries
+
 from tkinter import * 
 import time
 import random
 
-"""
-# Tarea programada 2: Operation Moonlight
-# Curso: Taller de programacion
-# Programadores: Andrés Uriza Lazo y Jose Pablo Esquetini Fallas
-"""
+# Global Variables
+
 seconds = 0
-#----------------------------------------------------------------------Nivel 1-------------------------------------------------------------------------------------------
-def level_1():  # Inicia el nivel 1, con dificultad facil
-    global avatar
+
+# Window class
+
+class Window():
+    # Window creation
+    def window_creator(self):
+        window = Tk()
+        window.title("Jungle Escape")
+        window.geometry("1000x650")
+        window.iconbitmap("sans.ico")
+        window.resizable(False, False)
+        main_menu = MainMenu(window)
+        main_menu.main_menu()
+
+# Main menu class
+
+class MainMenu():
+    def __init__(self , place):
+        self.window = place
+
+    # Main menu creation
+    def main_menu(self):
+        main_menu = Canvas(self.window , width = 1000 , height = 650 , bg = "Black")
+        main_menu.place(x = 0 , y = 0)
+
+        bg_image = PhotoImage(file = "menu bg.png")
+        bg_image_label = Label(main_menu , image = bg_image)
+        bg_image_label.place(x = 0 , y = 0)
+
+        name_entry = Entry(main_menu, width=40)
+        name_entry.place(x=430, y=225)
+
+        play_button = Button(main_menu, font="Arial", text="Start Game" , command = self.level1)
+        play_button.place(x=450, y=300)
+
+        level1_select = Button(main_menu, text="Level 1", font="Arial", command = self.level1)
+        level1_select.place(x=365, y=400)
+
+        level2_select = Button(main_menu, text="Level 2", font="Arial" , command = self.level2)
+        level2_select.place(x=465, y=400)
+
+        level3_select = Button(main_menu, text="Level 3", font="Arial" , command = self.level3)
+        level3_select.place(x=560, y=400)
+
+        about = Button(main_menu, font="Arial", text="About")
+        about.place(x=470, y=500)
+
+        hall_of_fame = Button(main_menu, font="Arial", text="Hall of Fame")
+        hall_of_fame.place(x=445, y=560)
+
+        # Setting window as the mainloop
+        self.window.mainloop()
     
-    level1_window = Toplevel()
-    level1_window.title("Nivel 1")
-    level1_window.geometry("1200x600")
-    level1_window.resizable(False, False)
+    # Level 1
+    def level1(self):
+        level1 = LevelCreation(1 , self.window) 
+        level1.interface()
 
-    background = Canvas(level1_window, width=1210, height=610, borderwidth= -5, bg="gray")
-    background.grid()
+    # Level 2
+    def level2(self):
+        level2 = LevelCreation(2 , self.window) 
+        level2.interface()
+    
+    # Level 3
+    def level3(self):
+        level3 = LevelCreation(3 , self.window) 
+        level3.interface()
 
-    informacion = Canvas(background, width=350, height=1000, borderwidth= -25, bg="black")
-    informacion.place(x=0, y=0)
+# Level creation class
 
+class LevelCreation():
+    def __init__(self , level , place):
+        self.window = place
+        if level == 1:
+            self.speed = 5
+            self.projectile = 4
+        elif level == 2:
+            self.speed = 5
+            self.projectile = 3
+        elif level == 3:
+            self.speed = 5
+            self.projectile = 2
+
+    def interface(self):
+        level = Canvas(self.window , width = 1200 , height = 650 , bg = "Black")
+        level.place(x = 0 , y = 0)
+
+        bg_image = PhotoImage(file = "level image.png")
+        image_label = Label(level , image = bg_image)
+        image_label.place(x = 250 , y = 0)
+
+        score = Label(level , text = "score" , font = ("Arial" , 16) , bg = "Black" , fg = "White")
+        score.place(x = 30 , y = 100)
+
+        main_menu_button = Button(self.window , text = "End Game" , font = ("Arial" , 16) , bg = "White" , fg = "Black" , command = self.go_back)
+        main_menu_button.place(x = 30 , y = 200)
+
+        def hello(self): # esto solo es para asegurarme que el canvas sigue funcionando, luego lo quito
+            print("I'm still here")
+            level.after(1000 , hello , self)
+        
+        hello(self)
+
+        level.mainloop()
+
+    def go_back(self):
+        main_menu = MainMenu(self.window)
+        main_menu.main_menu()
+
+"""
     def counter():
         global seconds
         seconds += 1
@@ -85,46 +187,8 @@ def level_1():  # Inicia el nivel 1, con dificultad facil
         background.after(1000, create)
 
     create()    
-#-------------------------------------------------------------------Menu principal---------------------------------------------------------------------------------------
-menu_window = Tk()
-menu_window.title("Juego") # Pendiente definir nombre
-menu_window.geometry("1200x600")
-menu_window.resizable(False, False)
+"""
 
-avatar = PhotoImage(file="imagenes/soldado.png")
-obstacle = PhotoImage(file="imagenes/proyectil.png")
-
-nombre_label = Label(menu_window, text="Nombre:", font="Arial")
-nombre_label.place(x=400, y=400)
-
-nombre_entry = Entry(menu_window, width=50)
-nombre_entry.place(x=480, y=403)
-
-play_button = Button(menu_window, font="Arial", text="Jugar", command=level_1)
-play_button.place(x=590, y=440)
-
-level_select__label = Label(menu_window, text="o bien, seleccione el nivel:", font="Arial")
-level_select__label.place(x=520, y=480)
-
-level1_select = Button(menu_window, text="Nivel 1", font="Arial", command=level_1)
-level1_select.place(x=460, y=520)
-
-level2_select = Button(menu_window, text="Nivel 2", font="Arial")
-level2_select.place(x=580, y=520)
-
-level3_select = Button(menu_window, text="Nivel 3", font="Arial")
-level3_select.place(x=700, y=520)
-
-about = Button(menu_window, font="Arial", text="About")
-about.place(x=150, y=440)
-
-puntajes = Button(menu_window, font="Arial", text="Puntajes")
-puntajes.place(x=1000, y=440)
-
-aviso_label = Label(menu_window, text="Por favor, recuerde ingresar un nombre antes de comenzar", font="Arial")
-aviso_label.place(x=420, y=570)
-
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-menu_window.mainloop()
-# Hola
-
+# Creating the window object
+game = Window()
+game.window_creator()
