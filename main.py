@@ -24,7 +24,7 @@ class Window():
         window = Tk()
         window.title("Jungle Escape")
         window.geometry("1000x650")
-        window.iconbitmap("sans.ico")
+        window.iconbitmap("images/sans.ico")
         window.resizable(False, False)
         main_menu = MainMenu(window)
         main_menu.main_menu()
@@ -40,7 +40,7 @@ class MainMenu():
         main_menu = Canvas(self.window , width = 1000 , height = 650 , bg = "Black")
         main_menu.place(x = 0 , y = 0)
 
-        bg_image = PhotoImage(file = "menu bg.png")
+        bg_image = PhotoImage(file ="images/menu bg.png")
         bg_image_label = Label(main_menu , image = bg_image)
         bg_image_label.place(x = 0 , y = 0)
 
@@ -102,7 +102,7 @@ class LevelCreation():
         level = Canvas(self.window , width = 1200 , height = 650 , bg = "Black")
         level.place(x = 0 , y = 0)
 
-        bg_image = PhotoImage(file = "level image.png")
+        bg_image = PhotoImage(file = "images/level image.png")
         image_label = Label(level , image = bg_image)
         image_label.place(x = 250 , y = 0)
 
