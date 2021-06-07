@@ -6,17 +6,18 @@
 - Ultima modificacion: 05/06/2021
 """
 
-# Libraries
+#---------------------------------------------------------------------------Libraries-----------------------------------------------------------------------------------
 
 from tkinter import * 
 import time
 import random
+import pickle
 
-# Global Variables
+#-------------------------------------------------------------------------Global Variables------------------------------------------------------------------------------
 
 seconds = 0
 
-# Window class
+#---------------------------------------------------------------------------Window class---------------------------------------------------------------------------------
 
 class Window():
     # Window creation
@@ -28,8 +29,7 @@ class Window():
         window.resizable(False, False)
         main_menu = MainMenu(window)
         main_menu.main_menu()
-
-# Main menu class
+#---------------------------------------------------------------------------Main menu class-----------------------------------------------------------------------------
 
 class MainMenu():
     def __init__(self , place):
@@ -82,6 +82,53 @@ class MainMenu():
     def level3(self):
         level3 = LevelCreation(3 , self.window) 
         level3.interface()
+
+    #----------------------------------------------------------------------------Hall of fame-------------------------------------------------------------------------------
+
+    def divide(self, list, i, j): # Funcion que genera particiones mayores y menores de una lista a partir de un pivot
+        pivot = list[i]
+        left = i + 1
+        right = j
+
+        while left <= right: # Mientras el puntero izquierdo este antes que el derecho
+            if list[left] < pivot:
+                left += 1
+            else:
+                if list[right] > pivot:
+                    right -= 1
+                else:
+                    list[left], list[right] = list[right], list[left] # Se intercambian punteros
+                    left += 1
+                    right -= 1
+        list[i], list[right] = list[right], list[i] # Se posiciona pivot
+        return right # Retorna nueva posicion del pivot
+
+
+    def quicksort(self, list, start, end): # Funcion que genera particiones de una lista hasta que quede ordenada
+        if start < end: # Mientras puntero izquierdo este antes que el derecho (lista en total)
+            partition = self.divide(list, start, end)
+            self.quicksort(list, start, partition - 1)
+            self.quicksort(list, partition + 1, end)
+
+
+    def points(self, score): # Funcion que lee los puntos en binario de un archivo .txt, los ordena y reescribe si necesario
+        file = open("puntajes.txt", "rb")
+        top_10 = pickle.load(file)
+        top_10.append(score)
+        file.close()
+        self.quicksort(top_10, 0, len(top_10) - 1)
+        
+        file = open("puntajes.txt", "wb")
+        if len(top_10) > 10: # Si los puntajes se exceden de 10, se recorta el menor
+            top_10 = top_10[1:]
+        pickle.dump(top_10, file)
+        file.close()
+
+        file = open("puntajes.txt", "rb")
+        top_10 = pickle.load(file)
+        print(top_10)
+        file.close()
+        
 
 # Level creation class
 
@@ -192,3 +239,7 @@ class LevelCreation():
 # Creating the window object
 game = Window()
 game.window_creator()
+
+
+# https://stackabuse.com/quicksort-in-python    Para saber como implementar el algoritmo quicksort
+# https://www.codegrepper.com/code-examples/python/read+a+text+file+in+python+and+dump+the+contents  Para saber como utilizar Pickle
