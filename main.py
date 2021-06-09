@@ -8,10 +8,14 @@
 
 #---------------------------------------------------------------------------Libraries-----------------------------------------------------------------------------------
 
-from tkinter import * 
-import time
+from tkinter import *
+from pygame import mixer
 import random
 import pickle
+import pygame
+
+pygame.init()
+
 
 #-------------------------------------------------------------------------Global Variables------------------------------------------------------------------------------
 
@@ -34,6 +38,9 @@ class Window():
 class MainMenu():
     def __init__(self , place):
         self.window = place
+    
+    mixer.music.load("menu_song.wav")
+    mixer.music.play(-1) # loop
 
     # Main menu creation
     def main_menu(self):
@@ -130,115 +137,157 @@ class MainMenu():
         file.close()
         
 
-# Level creation class
+class Avatar():
+    def __init__(self, window, avatar_pic, level):
+        self.avatar_pic = avatar_pic
+        self.level = level
+        self.window = window
+        self.window.bind("<Up>", self.up)
+        self.window.bind("<Down>", self.down)
+        self.window.bind("<Left>", self.left)
+        self.window.bind("<Right>", self.right) 
 
+    def get_coords(self):
+        return self.level.coords(self.avatar_pic)
+
+    def left(self, key): # Mueve al avatar a la izquierda
+        if self.level.coords(self.avatar_pic)[0] > 300:
+            self.level.move(self.avatar_pic, -30, 0)
+
+    def right(self, key): # Mueve al avatar a la derecha
+        if self.level.coords(self.avatar_pic)[0] < 950:
+            self.level.move(self.avatar_pic, 30, 0)
+
+    def up(self, key): # Mueve al avatar hacia arriba
+        if self.level.coords(self.avatar_pic)[1] > 90:
+            self.level.move(self.avatar_pic, 0, -30)
+
+    def down(self, key): # Mueve al avatar hacia abajo
+        if self.level.coords(self.avatar_pic)[1] < 600:
+            self.level.move(self.avatar_pic, 0, 30)
+
+
+class Obstacle():
+    def __init__(self, window, level, speed, frequency, avatar):
+        self.window = window
+        self.level = level
+        self.x_speed = speed
+        self.y_speed = speed
+        self.frequency = frequency
+        self.counter = 0
+        self.proyectile_image = PhotoImage(file="images/shuriken.png")
+        self.proyectile = self.level.create_image(random.randint(350, 900), random.randint(130, 550), image=self.proyectile_image)
+        self.avatar = avatar
+        self.animate()
+
+    def get_coords(self):
+        return self.level.coords(self.proyectile)
+
+    def animate(self): # Mueve a los proyectiles
+        shuriken = mixer.Sound("shuriken.wav")
+
+        #if self.avatar.get_coords() == self.get_coords():
+        if self.counter != 2:
+            x = self.level.coords(self.proyectile)[0]
+            y = self.level.coords(self.proyectile)[1]
+            if x >= 950 or x <= 300:
+                self.counter += 1
+                self.x_speed = -self.x_speed
+                shuriken.play()
+            if y >= 600 or y <= 90:
+                self.counter += 1
+                self.y_speed = -self.y_speed
+                shuriken.play()
+            self.level.move(self.proyectile, self.x_speed, self.y_speed)
+            self.window.after(10, self.animate)   
+
+
+# Level creation class
 class LevelCreation():
-    def __init__(self , level , place):
+    def __init__(self, level, place):
         self.window = place
+        self.seconds = 60
+        self.points = 0
+
         if level == 1:
-            self.speed = 5
+            self.speed = random.choice([-5,5])
             self.projectile = 4
         elif level == 2:
-            self.speed = 5
+            self.speed = random.choice([-5,5])
             self.projectile = 3
         elif level == 3:
-            self.speed = 5
+            self.speed = random.choice([-5,5])
             self.projectile = 2
 
-    def interface(self):
-        level = Canvas(self.window , width = 1200 , height = 650 , bg = "Black")
-        level.place(x = 0 , y = 0)
-
-        bg_image = PhotoImage(file = "images/level image.png")
-        image_label = Label(level , image = bg_image)
-        image_label.place(x = 250 , y = 0)
-
-        score = Label(level , text = "score" , font = ("Arial" , 16) , bg = "Black" , fg = "White")
-        score.place(x = 30 , y = 100)
-
-        main_menu_button = Button(self.window , text = "End Game" , font = ("Arial" , 16) , bg = "White" , fg = "Black" , command = self.go_back)
-        main_menu_button.place(x = 30 , y = 200)
-
-        def hello(self): # esto solo es para asegurarme que el canvas sigue funcionando, luego lo quito
-            print("I'm still here")
-            level.after(1000 , hello , self)
-        
-        hello(self)
-
-        level.mainloop()
-
-    def go_back(self):
+    def go_back(self):  # Retorna al menu principal
         main_menu = MainMenu(self.window)
         main_menu.main_menu()
 
-"""
-    def counter():
-        global seconds
-        seconds += 1
-        return seconds
 
-    class Avatar():
-        def __init__(self):
-            self.avatar_pic = background.create_image(600, 300, image=avatar)
+    def interface(self): # Define los elementos del nivel
+        level_canvas = Canvas(self.window, width= 1000, height= 650)
+        level_canvas.place(x = 0 , y = 0)
 
-        def left(self, key): # Mueve al avatar a la izquierda
-           if background.coords(self.avatar_pic)[0] > 380:
-                background.move(self.avatar_pic, -30, 0)
+        bg_image = PhotoImage(file ="images/level image.png")
+        level_canvas.create_image(600, 325, image=bg_image)
 
-        def right(self, key): # Mueve al avatar a la derecha
-           if background.coords(self.avatar_pic)[0] < 1130:
-                background.move(self.avatar_pic, 30, 0)
+        score_canvas = Canvas(self.window, width = 250 , height = 650 , bg = "Black")
+        score_canvas.place(x = 0 , y = 0)
 
-        def up(self, key): # Mueve al avatar hacia arriba
-           if background.coords(self.avatar_pic)[1] > 70:
-                background.move(self.avatar_pic, 0, -30)
+        ninja = PhotoImage(file="images/ninja.png")
+        ninja_pic = level_canvas.create_image(600, 300, image=ninja)
+        player = Avatar(self.window, ninja_pic, level_canvas)
+        
 
-        def down(self, key): # Mueve al avatar hacia abajo
-           if background.coords(self.avatar_pic)[1] < 520:
-                background.move(self.avatar_pic, 0, 30)
+        def seconds():
+            timer = Label(score_canvas, text = f"Remaining: {self.seconds}" , font = ("Arial" , 16) , bg = "Black" , fg = "White")
+            timer.place(x = 30 , y = 150)
+            
+            score = Label(score_canvas, text = f"Score: {self.points}" , font = ("Arial" , 16) , bg = "Black" , fg = "White")
+            score.place(x = 30 , y = 300)
 
-    class Obstacle():
-        def __init__(self, x_pos, y_pos, x_speed, y_speed):
-            self.counter = 0
-            self.obstacle_pic = background.create_image(x_pos, y_pos, image=obstacle)
-            self.x_speed = x_speed
-            self.y_speed = y_speed
+            self.window.after(1000, seconds)
 
-        def animate(self): # Mueve a los proyectiles
-            x = background.coords(self.obstacle_pic)[0]
-            y = background.coords(self.obstacle_pic)[1]
+        seconds()
 
-            if self.counter == 2:
-                self.obstacle_pic.destroy()
-            else:
-                if x >= 1180 or x <= 300:
-                    self.counter += 1
-                    self.x_speed = -self.x_speed
-                if y >= 540 or y <= 50:
-                    self.counter += 1
-                    self.y_speed = -self.y_speed
-            background.move(self.obstacle_pic, self.x_speed, self.y_speed)
-            background.after(10, self.animate)
+        main_menu_button = Button(self.window , text = "Go back" , font = ("Arial" , 16) , bg = "White" , fg = "Black", command=self.go_back)
+        main_menu_button.place(x = 30 , y = 50)
+            
 
-    player = Avatar()
+        def counter():  # Contador de segundos
+            self.seconds -= 1
+            self.points += 1
+            if self.seconds % self.speed == 0:
+                proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile, player)
+            self.window.after(1000, counter)
+            
 
-    level1_window.bind("<Up>", player.up)
-    level1_window.bind("<Down>", player.down)
-    level1_window.bind("<Left>", player.left)
-    level1_window.bind("<Right>", player.right)        
+        counter()
+
+        def hello(self): # esto solo es para asegurarme que el canvas sigue funcionando, luego lo quito
+            print("I'm still here")
+            level_canvas.after(1000 , hello , self)
     
-    def create():
-        if counter() % 2 == 0:
-            proyectile = Obstacle(random.randint(300, 1180), random.randint(50, 540), random.randint(-5, 5), random.randint(-5, 5))
-            proyectile.animate()
-        background.after(1000, create)
+        hello(self)
 
-    create()    
-"""
 
+        level_canvas.mainloop()
+
+    """
+    Logica para sonido de herido
+
+    hurt = mixer.Sound("hurt.wav") 
+    hurt.play()
+
+    Logica para sonido de shuriken rebotando con un borde
+
+    
+    """
+    
 # Creating the window object
 game = Window()
 game.window_creator()
+
 
 
 # https://stackabuse.com/quicksort-in-python    Para saber como implementar el algoritmo quicksort
