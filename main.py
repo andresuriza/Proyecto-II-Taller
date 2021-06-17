@@ -19,7 +19,7 @@ pygame.init()
 
 #-------------------------------------------------------------------------Global Variables------------------------------------------------------------------------------
 
-
+player_coords = [0 , 0]
 
 #---------------------------------------------------------------------------Window class---------------------------------------------------------------------------------
 
@@ -146,9 +146,13 @@ class Avatar():
         self.window.bind("<Down>", self.down)
         self.window.bind("<Left>", self.left)
         self.window.bind("<Right>", self.right) 
+        self.get_coords()
 
     def get_coords(self):
-        return self.level.coords(self.avatar_pic)
+        global player_coords
+        position = self.level.coords(self.avatar_pic)
+        player_coords = position
+        self.level.after(10 , self.get_coords) 
 
     def left(self, key): # Mueve al avatar a la izquierda
         if self.level.coords(self.avatar_pic)[0] > 300:
@@ -181,9 +185,19 @@ class Obstacle():
         self.proyectile = self.level.create_image(self.coords[0], self.coords[1], image=self.proyectile_image)
         self.avatar = avatar
         self.animate()
+        self.collision()
 
     def get_coords(self):
         return self.level.coords(self.proyectile)
+    
+    def collision(self):
+        global player_coords
+        position = self.level.coords(self.proyectile)
+        player_hitbox = [player_coords[0] , player_coords[1] , 100 , 150]
+        proyectile_hitbox = [position[0] , position[1] , 100 , 100]
+        if player_hitbox[0] < proyectile_hitbox[0] + proyectile_hitbox[2] and player_hitbox[0] + player_hitbox[2] > proyectile_hitbox[0] and player_hitbox[1] < proyectile_hitbox[1] + proyectile_hitbox[3] and player_hitbox[1] + player_hitbox[3] > proyectile_hitbox[1]:
+            self.level.delete(self.proyectile)
+        self.level.after(100 , self.collision)
 
     def animate(self): # Mueve a los proyectiles
         shuriken = mixer.Sound("shuriken.wav")
@@ -201,7 +215,9 @@ class Obstacle():
                 self.y_speed = -self.y_speed
                 shuriken.play()
             self.level.move(self.proyectile, self.x_speed, self.y_speed)
-            self.window.after(10, self.animate)   
+            self.window.after(10, self.animate)
+        else: 
+            self.level.delete(self.proyectile)   
 
 
 # Level creation class
