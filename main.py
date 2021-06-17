@@ -19,7 +19,7 @@ pygame.init()
 
 #-------------------------------------------------------------------------Global Variables------------------------------------------------------------------------------
 
-seconds = 0
+
 
 #---------------------------------------------------------------------------Window class---------------------------------------------------------------------------------
 
@@ -176,7 +176,9 @@ class Obstacle():
         self.frequency = frequency
         self.counter = 0
         self.proyectile_image = PhotoImage(file="images/shuriken.png")
-        self.proyectile = self.level.create_image(random.randint(350, 900), random.randint(130, 550), image=self.proyectile_image)
+        self.options = [[350 , random.randint(130 , 550)] , [900 , random.randint(130 , 550)] , [random.randint(350 , 900) , 130] , [random.randint(350 , 900) , 550]]
+        self.coords = random.choice(self.options)
+        self.proyectile = self.level.create_image(self.coords[0], self.coords[1], image=self.proyectile_image)
         self.avatar = avatar
         self.animate()
 
@@ -229,7 +231,7 @@ class LevelCreation():
         level_canvas.place(x = 0 , y = 0)
 
         bg_image = PhotoImage(file ="images/level image.png")
-        level_canvas.create_image(600, 325, image=bg_image)
+        level_canvas.create_image(250, 0, image=bg_image , anchor = NW)
 
         score_canvas = Canvas(self.window, width = 250 , height = 650 , bg = "Black")
         score_canvas.place(x = 0 , y = 0)
@@ -268,7 +270,7 @@ class LevelCreation():
             print("I'm still here")
             level_canvas.after(1000 , hello , self)
     
-        hello(self)
+        # hello(self)
 
 
         level_canvas.mainloop()
