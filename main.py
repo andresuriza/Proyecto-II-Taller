@@ -66,8 +66,8 @@ class MainMenu():
         level3_select = Button(main_menu, text="Level 3", font="Arial" , command = self.level3)
         level3_select.place(x=560, y=400)
 
-        about = Button(main_menu, font="Arial", text="About")
-        about.place(x=470, y=500)
+        about_button = Button(main_menu, text="About" , font = "Arial" , command = self.about)
+        about_button.place(x=470, y=500)
 
         hall_of_fame = Button(main_menu, font="Arial", text="Hall of Fame")
         hall_of_fame.place(x=445, y=560)
@@ -89,6 +89,44 @@ class MainMenu():
     def level3(self):
         level3 = LevelCreation(3 , self.window) 
         level3.interface()
+    
+    # About
+    def about(self):
+        about = Canvas(self.window , width = 1000 , height = 650 , bg = "Black")
+        about.place(x = 0 , y = 0)
+
+        label1 = Label(about , text = "About Jungle Escape" , font = ("Arial" , 24) , fg = "White" , bg = "Black")
+        label1.place(x = 350 , y = 30)
+
+        label2 = Label(about , text = "Pais de Produccion: Costa Rica" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label2.place(x = 30 , y = 100)
+
+        label3 = Label(about , text = "Ingenieria en Computadores, Tecnologico de Costa Rica" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label3.place(x = 30 , y = 150)
+
+        label4 = Label(about , text = "Taller de Programacion CE-1102" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label4.place(x = 30 , y = 200)
+
+        label5 = Label(about , text = "Primer Semestre, 2021" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label5.place(x = 30 , y = 250)
+
+        label6 = Label(about , text = "Jeff Schmidt Peralta, Grupo 01" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label6.place(x = 30 , y = 300)
+
+        label7 = Label(about , text = "Python, Version: 3.no estoy seguro" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label7.place(x = 30 , y = 350)
+
+        label8 = Label(about , text = "Andres Uriza Lazo y Jose Pablo Esquetini Fallas" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label8.place(x = 30 , y = 400)
+
+        label9 = Label(about , text = "Mae Imp si usted ha usado algun modulo, pongase el autor aqui" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label9.place(x = 30 , y = 450)
+
+        label10 = Label(about , text = "Jungle Escape es un juego de movimiento, este se realiza con las 4 flechas del teclado" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label10.place(x = 30 , y = 500)
+
+        go_back = Button(about , text = "Main Menu" , font = "Arial" , command = self.main_menu)
+        go_back.place(x = 30 , y = 550)
 
     #----------------------------------------------------------------------------Hall of fame-------------------------------------------------------------------------------
 
