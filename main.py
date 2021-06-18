@@ -101,7 +101,7 @@ class MainMenu():
         label2 = Label(about , text = "Pais de Produccion: Costa Rica" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
         label2.place(x = 30 , y = 100)
 
-        label3 = Label(about , text = "Ingenieria en Computadores, Tecnologico de Costa Rica" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label3 = Label(about , text = "Ingenieria en Computadores - Instituto Tecnologico de Costa Rica" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
         label3.place(x = 30 , y = 150)
 
         label4 = Label(about , text = "Taller de Programacion CE-1102" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
@@ -119,11 +119,14 @@ class MainMenu():
         label8 = Label(about , text = "Andres Uriza Lazo y Jose Pablo Esquetini Fallas" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
         label8.place(x = 30 , y = 400)
 
-        label9 = Label(about , text = "Mae Imp si usted ha usado algun modulo, pongase el autor aqui" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label9 = Label(about , text = "Modulos utilizados: Pygame, por: Lenard Lindstrom, René Dudfield, Pete Shinners, Nicholas Dudfield" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
         label9.place(x = 30 , y = 450)
 
+        label9b = Label(about , text = "y Thomas Kluyver." , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        label9b.place(x = 30 , y = 480)
+
         label10 = Label(about , text = "Jungle Escape es un juego de movimiento, este se realiza con las 4 flechas del teclado" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
-        label10.place(x = 30 , y = 500)
+        label10.place(x = 30 , y = 520)
 
         go_back = Button(about , text = "Main Menu" , font = "Arial" , command = self.main_menu)
         go_back.place(x = 30 , y = 550)
@@ -343,8 +346,3 @@ class LevelCreation():
 # Creating the window object
 game = Window()
 game.window_creator()
-
-
-
-# https://stackabuse.com/quicksort-in-python    Para saber como implementar el algoritmo quicksort
-# https://www.codegrepper.com/code-examples/python/read+a+text+file+in+python+and+dump+the+contents  Para saber como utilizar Pickle
