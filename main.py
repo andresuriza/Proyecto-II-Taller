@@ -282,9 +282,6 @@ class Obstacle:
         self.animate()
         self.collision()
 
-    def get_coords(self):
-        return self.level.coords(self.proyectile)
-
     def collision(self):
         global player_coords
         position = self.level.coords(self.proyectile)
@@ -305,8 +302,9 @@ class Obstacle:
         shuriken = mixer.Sound("shuriken.wav")
 
         if self.counter != 2:
-            x = self.level.coords(self.proyectile)[0]
-            y = self.level.coords(self.proyectile)[1]
+            position = self.level.coords(self.proyectile)
+            x = position[0]
+            y = position[1]
             if x >= 950 or x <= 300:
                 self.counter += 1
                 self.x_speed = -self.x_speed
@@ -342,11 +340,7 @@ class LevelCreation:
             self.speed = random.choice([-5, 5])
             self.projectile = 2
 
-    def go_back(self):  # Retorna al menu principal
-        main_menu = MainMenu(self.window)
-        main_menu.main_menu()
-
-    def go_back_points(self):
+    def go_back_points(self): # Retorna al menu principal, y procesa el puntaje obtenido
         main_menu = MainMenu(self.window)
         main_menu.points(self.points)
         main_menu.main_menu()
@@ -363,7 +357,7 @@ class LevelCreation:
         score_canvas.place(x=0, y=0)
 
         ninja = PhotoImage(file="images/ninja.png")
-        ninja_pic = level_canvas.create_image(600, 300, image=ninja)
+        ninja_pic = level_canvas.create_image(600, 300, image=ninja , anchor = NW)
         player = Avatar(self.window, ninja_pic, level_canvas)
 
         def UI():
@@ -389,7 +383,7 @@ class LevelCreation:
 
         UI()
 
-        main_menu_button = Button(self.window, text="Go back", font=("Arial", 16), bg="White", fg="Black", command=self.go_back)
+        main_menu_button = Button(self.window, text="Go back", font=("Arial", 16), bg="White", fg="Black", command=self.go_back_points)
         main_menu_button.place(x=30, y=50)
 
         def counter():  # Contador de segundos
