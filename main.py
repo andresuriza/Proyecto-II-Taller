@@ -20,7 +20,8 @@ pygame.init()
 # -------------------------------------------------------------------------Global Variables------------------------------------------------------------------------------
 
 player_coords = [0, 0]
-
+lives = 3
+energy = 20
 
 # ---------------------------------------------------------------------------Window class---------------------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ class Window:
 class MainMenu:
     def __init__(self, place):
         self.window = place
+        self.username = ""
 
     mixer.music.load("menu_song.wav")
     mixer.music.play(-1)  # loop
@@ -56,6 +58,13 @@ class MainMenu:
 
         name_entry = Entry(main_menu, width=40)
         name_entry.place(x=430, y=225)
+
+        # Username setting function
+        def set_name():
+            self.username = name_entry.get()
+            self.window.after(1000 , set_name)
+        
+        set_name()
 
         play_button = Button(main_menu, font="Arial", text="Start Game", command=self.level1)
         play_button.place(x=450, y=300)
@@ -80,17 +89,17 @@ class MainMenu:
 
     # Level 1
     def level1(self):
-        level1 = LevelCreation(1, self.window)
+        level1 = LevelCreation(1, self.window , self.username)
         level1.interface()
 
     # Level 2
     def level2(self):
-        level2 = LevelCreation(2, self.window)
+        level2 = LevelCreation(2, self.window , self.username)
         level2.interface()
 
     # Level 3
     def level3(self):
-        level3 = LevelCreation(3, self.window)
+        level3 = LevelCreation(3, self.window , self.username)
         level3.interface()
 
     # About
@@ -291,11 +300,11 @@ class Obstacle:
         if player_hitbox[0] < proyectile_hitbox[0] + proyectile_hitbox[2] and player_hitbox[0] + player_hitbox[2] > \
                 proyectile_hitbox[0] and player_hitbox[1] < proyectile_hitbox[1] + proyectile_hitbox[3] and \
                 player_hitbox[1] + player_hitbox[3] > proyectile_hitbox[1]:
+            global energy
             hurt.play()
+            energy -= 1
             self.level.delete(self.proyectile)
         self.level.after(100, self.collision)
-
-
 
     def animate(self):  # Mueve a los proyectiles
         shuriken = mixer.Sound("shuriken.wav")
@@ -323,11 +332,17 @@ class Obstacle:
 
 
 class LevelCreation:
-    def __init__(self, level, place):
+    def __init__(self, level, place , name):
+        global lives, energy
+        lives = 3
+        energy = 20
         self.level = level
         self.window = place
         self.seconds = 60
         self.points = 0
+        self.lives = lives
+        self.energy = energy
+        self.name = name
 
         if level == 1:
             self.speed = random.choice([-5, 5])
@@ -363,36 +378,60 @@ class LevelCreation:
             if self.seconds == 0:
                 self.go_back_points()
 
-            if self.level == 1:
-                level_name = Label(score_canvas, text="Level 1", font=("Arial", 16), bg="Black", fg="White")
-            if self.level == 2:
-                level_name = Label(score_canvas, text="Level 2", font=("Arial", 16), bg="Black", fg="White")
-            if self.level == 3:
-                level_name = Label(score_canvas, text="Level 3", font=("Arial", 16), bg="Black", fg="White")
-
-            level_name.place(x=30, y=420)
-
             timer = Label(score_canvas, text=f"Time: {self.seconds}", font=("Arial", 16), bg="Black", fg="White", borderwidth=11)
-            timer.place(x=30, y=150)
+            timer.place(x=23, y=125)
 
             score = Label(score_canvas, text=f"Score: {self.points}", font=("Arial", 16), bg="Black", fg="White")
-            score.place(x=30, y=300)
+            score.place(x=30, y=200)
 
-            self.window.after(1000, UI)
+            lives = Label(score_canvas , text= f"Player's Lives: {self.lives}" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            lives.place(x = 30 , y = 350)
+
+            energy = Label(score_canvas , text = f"Energy left: {self.energy}   " , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            energy.place(x = 30 , y = 425)
+
+            self.window.after(100, UI)
 
         UI()
 
-        main_menu_button = Button(self.window, text="Go back", font=("Arial", 16), bg="White", fg="Black", command=self.go_back_points)
-        main_menu_button.place(x=30, y=50)
+        # UI elements that do not change
+        if self.level == 1:
+            level_name = Label(score_canvas, text="Level 1", font=("Arial", 24), bg="Black", fg="White")
+        if self.level == 2:
+            level_name = Label(score_canvas, text="Level 2", font=("Arial", 24), bg="Black", fg="White")
+        if self.level == 3:
+            level_name = Label(score_canvas, text="Level 3", font=("Arial", 24), bg="Black", fg="White")
 
-        def counter():  # Contador de segundos
+        level_name.place(x=30, y=50)
+
+        username = Label(score_canvas , text = f"Username: {self.name}" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+        username.place(x = 30 , y = 275)
+
+        main_menu_button = Button(self.window, text="Go back", font=("Arial", 16), bg="White", fg="Black", command=self.go_back_points)
+        main_menu_button.place(x=30, y=500)
+
+        # Seconds Counter
+        def counter():  
             self.seconds -= 1
             self.points += 1
-            if self.seconds % self.speed == 0:
-                proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile)
+            # if self.seconds % self.speed == 0:
+                # proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile)
+            proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile)
             self.window.after(1000, counter)
 
         counter()
+
+        # Lives and energy updates
+        def update():
+            global lives, energy
+            self.lives = lives
+            self.energy = energy
+            if energy == 0:
+                lives -= 1
+                energy = 20
+            self.window.after(100 , update)
+        
+        update()
 
         level_canvas.mainloop()
 
