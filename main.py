@@ -120,7 +120,7 @@ class MainMenu:
         label7 = Label(about, text="Python, Version: 3.9", font=("Arial", 16), fg="White", bg="Black")
         label7.place(x=30, y=350)
 
-        label8 = Label(about, text="Andres Uriza Lazo y Jose Pablo Esquetini Fallas", font=("Arial", 16), fg="White",
+        label8 = Label(about, text="Autores: Andres Uriza Lazo y Jose Pablo Esquetini Fallas", font=("Arial", 16), fg="White",
                        bg="Black")
         label8.place(x=30, y=400)
 
@@ -135,10 +135,10 @@ class MainMenu:
         label10 = Label(about,
                         text="Jungle Escape es un juego de movimiento, este se realiza con las 4 flechas del teclado",
                         font=("Arial", 16), fg="White", bg="Black")
-        label10.place(x=30, y=520)
+        label10.place(x=30, y=530)
 
         go_back = Button(about, text="Main Menu", font="Arial", command=self.main_menu)
-        go_back.place(x=30, y=550)
+        go_back.place(x=30, y=580)
 
     # ----------------------------------------------------------------------------Hall of fame-------------------------------------------------------------------------------
 
@@ -242,31 +242,31 @@ class Avatar:
         self.window.bind("<Right>", self.right)
         self.get_coords()
 
-    def get_coords(self):
+    def get_coords(self): # Indicates the player's current location
         global player_coords
         position = self.level.coords(self.avatar_pic)
         player_coords = position
         self.level.after(10, self.get_coords)
 
     def left(self, key):  # Mueve al avatar a la izquierda
-        if self.level.coords(self.avatar_pic)[0] > 300:
-            self.level.move(self.avatar_pic, -30, 0)
+        if self.level.coords(self.avatar_pic)[0] > 260:
+            self.level.move(self.avatar_pic, -20, 0)
 
     def right(self, key):  # Mueve al avatar a la derecha
-        if self.level.coords(self.avatar_pic)[0] < 950:
-            self.level.move(self.avatar_pic, 30, 0)
+        if self.level.coords(self.avatar_pic)[0] < 890:
+            self.level.move(self.avatar_pic, 20, 0)
 
     def up(self, key):  # Mueve al avatar hacia arriba
-        if self.level.coords(self.avatar_pic)[1] > 90:
-            self.level.move(self.avatar_pic, 0, -30)
+        if self.level.coords(self.avatar_pic)[1] > 10:
+            self.level.move(self.avatar_pic, 0, -20)
 
     def down(self, key):  # Mueve al avatar hacia abajo
-        if self.level.coords(self.avatar_pic)[1] < 600:
-            self.level.move(self.avatar_pic, 0, 30)
+        if self.level.coords(self.avatar_pic)[1] < 490:
+            self.level.move(self.avatar_pic, 0, 20)
 
 
 class Obstacle:
-    def __init__(self, window, level, speed, frequency, avatar):
+    def __init__(self, window, level, speed, frequency):
         self.window = window
         self.level = level
         self.x_speed = speed
@@ -274,19 +274,18 @@ class Obstacle:
         self.frequency = frequency
         self.counter = 0
         self.proyectile_image = PhotoImage(file="images/shuriken.png")
-        self.options = [[350, random.randint(130, 550)], [900, random.randint(130, 550)],
-                        [random.randint(350, 900), 130], [random.randint(350, 900), 550]]
+        self.options = [[260, random.randint(10, 575)], [925, random.randint(10, 575)],
+                        [random.randint(260, 925), 10], [random.randint(260, 925), 575]]
         self.coords = random.choice(self.options)
-        self.proyectile = self.level.create_image(self.coords[0], self.coords[1], image=self.proyectile_image)
-        self.avatar = avatar
+        self.proyectile = self.level.create_image(self.coords[0], self.coords[1], image=self.proyectile_image , anchor = NW)
         self.animate()
         self.collision()
 
     def collision(self):
         global player_coords
         position = self.level.coords(self.proyectile)
-        player_hitbox = [player_coords[0], player_coords[1], 100, 150]
-        proyectile_hitbox = [position[0], position[1], 100, 100]
+        player_hitbox = [player_coords[0], player_coords[1], 85, 130]
+        proyectile_hitbox = [position[0], position[1], 75, 75]
         hurt = mixer.Sound("hurt.wav")
 
         if player_hitbox[0] < proyectile_hitbox[0] + proyectile_hitbox[2] and player_hitbox[0] + player_hitbox[2] > \
@@ -305,11 +304,11 @@ class Obstacle:
             position = self.level.coords(self.proyectile)
             x = position[0]
             y = position[1]
-            if x >= 950 or x <= 300:
+            if x >= 930 or x <= 250:
                 self.counter += 1
                 self.x_speed = -self.x_speed
                 shuriken.play()
-            if y >= 600 or y <= 90:
+            if y >= 580 or y <= 5:
                 self.counter += 1
                 self.y_speed = -self.y_speed
                 shuriken.play()
@@ -357,7 +356,7 @@ class LevelCreation:
         score_canvas.place(x=0, y=0)
 
         ninja = PhotoImage(file="images/ninja.png")
-        ninja_pic = level_canvas.create_image(600, 300, image=ninja , anchor = NW)
+        ninja_pic = level_canvas.create_image(610, 300, image=ninja , anchor = NW)
         player = Avatar(self.window, ninja_pic, level_canvas)
 
         def UI():
@@ -365,11 +364,11 @@ class LevelCreation:
                 self.go_back_points()
 
             if self.level == 1:
-                level_name = Label(score_canvas, text="Level 1 (Easy)", font=("Arial", 16), bg="Black", fg="White")
+                level_name = Label(score_canvas, text="Level 1", font=("Arial", 16), bg="Black", fg="White")
             if self.level == 2:
-                level_name = Label(score_canvas, text="Level 2 (Medium)", font=("Arial", 16), bg="Black", fg="White")
+                level_name = Label(score_canvas, text="Level 2", font=("Arial", 16), bg="Black", fg="White")
             if self.level == 3:
-                level_name = Label(score_canvas, text="Level 3 (Hard)", font=("Arial", 16), bg="Black", fg="White")
+                level_name = Label(score_canvas, text="Level 3", font=("Arial", 16), bg="Black", fg="White")
 
             level_name.place(x=30, y=420)
 
@@ -390,7 +389,7 @@ class LevelCreation:
             self.seconds -= 1
             self.points += 1
             if self.seconds % self.speed == 0:
-                proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile, player)
+                proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile)
             self.window.after(1000, counter)
 
         counter()
