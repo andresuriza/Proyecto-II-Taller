@@ -275,12 +275,11 @@ class Avatar:
 
 
 class Obstacle:
-    def __init__(self, window, level, speed, frequency):
+    def __init__(self, window, level, speed):
         self.window = window
         self.level = level
         self.x_speed = speed
         self.y_speed = speed
-        self.frequency = frequency
         self.counter = 0
         self.proyectile_image = PhotoImage(file="images/shuriken.png")
         self.options = [[260, random.randint(10, 575)], [925, random.randint(10, 575)],
@@ -345,14 +344,14 @@ class LevelCreation:
         self.name = name
 
         if level == 1:
-            self.speed = random.choice([-5, 5])
+            self.speed_options = [-5 , -4 , -3 , -2 , -1 , 1 , 2 , 3 , 4 , 5]
             self.projectile = 4
         if level == 2:
-            self.speed = random.choice([-5, 5])
-            self.projectile = 3
-        if level == 3:
-            self.speed = random.choice([-5, 5])
+            self.speed_options = [-6 , -5 , -4 , -3 , -2 , -1 , 1 , 2 , 3 , 4 , 5 , 6]
             self.projectile = 2
+        if level == 3:
+            self.speed_options = [-7 , -6 , -5 , -4 , -3 , -2 , -1 , 1 , 2 , 3 , 4 , 5 , 6 , 7]
+            self.projectile = 1
 
     def go_back_points(self): # Retorna al menu principal, y procesa el puntaje obtenido
         main_menu = MainMenu(self.window)
@@ -375,7 +374,7 @@ class LevelCreation:
         player = Avatar(self.window, ninja_pic, level_canvas)
 
         def UI():
-            if self.seconds == 0:
+            if self.seconds == 0 or self.lives == 0:
                 self.go_back_points()
 
             timer = Label(score_canvas, text=f"Time: {self.seconds}", font=("Arial", 16), bg="Black", fg="White", borderwidth=11)
@@ -414,12 +413,17 @@ class LevelCreation:
         def counter():  
             self.seconds -= 1
             self.points += 1
-            # if self.seconds % self.speed == 0:
-                # proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile)
-            proyectile = Obstacle(self.window, level_canvas, self.speed, self.projectile)
             self.window.after(1000, counter)
 
         counter()
+
+        # Projectile creator
+        def creator():
+            self.speed = random.choice(self.speed_options)
+            proyectile = Obstacle(self.window, level_canvas, self.speed)
+            self.window.after(250 * self.projectile , creator)
+        
+        creator()
 
         # Lives and energy updates
         def update():
