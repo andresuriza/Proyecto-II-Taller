@@ -101,16 +101,19 @@ class MainMenu:
 
     # Level 1
     def level1(self):
+        mixer.music.pause()
         level1 = LevelCreation(1, self.window , self.username)
         level1.interface()
 
     # Level 2
     def level2(self):
+        mixer.music.pause()
         level2 = LevelCreation(2, self.window , self.username)
         level2.interface()
 
     # Level 3
     def level3(self):
+        mixer.music.pause()
         level3 = LevelCreation(3, self.window , self.username)
         level3.interface()
 
@@ -372,18 +375,22 @@ class LevelCreation:
             self.speed_options = [-5 , -4 , -3, 3 , 4 , 5]
             self.projectile = 3
             self.reward = 1
+            mixer.music.load("level1 music.wav")
         if level == 2:
             self.speed_options = [-6 , -5 , -4 , -3, 3 , 4 , 5 , 6]
             self.projectile = 2
             self.reward = 3
+            mixer.music.load("level2 music.wav")
         if level == 3:
             self.speed_options = [-7 , -6 , -5 , -4 , -3, 3 , 4 , 5 , 6 , 7]
             self.projectile = 1
             self.reward = 5
+            mixer.music.load("level3 music.wav")
 
     # Retorna al menu principal, y procesa el puntaje obtenido
     def go_back_points(self): 
         self.game = False
+        mixer.music.pause()
         main_menu = MainMenu(self.window)
         main_menu.points(self.points)
         main_menu.main_menu()
@@ -402,6 +409,8 @@ class LevelCreation:
         ninja = PhotoImage(file="images/ninja.png")
         ninja_pic = level_canvas.create_image(610, 300, image=ninja , anchor = NW)
         player = Avatar(self.window, ninja_pic, level_canvas)
+
+        mixer.music.play()
 
         def UI():
             if self.game:
