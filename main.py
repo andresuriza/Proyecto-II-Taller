@@ -3,7 +3,7 @@
 - Projecto II
 - Taller de programacion - CE1102
 - Fecha de creacion: 04/06/2021
-- Ultima modificacion: 05/06/2021
+- Ultima modificacion: 22/06/2021
 """
 
 # ---------------------------------------------------------------------------Libraries-----------------------------------------------------------------------------------
@@ -194,12 +194,11 @@ class MainMenu:
 
     
     def hall_of_fame(self):
-        points = Toplevel()
-        points.geometry("500x300")
-        points.resizable(False, False)
-        points.configure(bg="black")
-
-        """        # Para reestablecer puntajes
+        points = Canvas(self.window , width=1000, height=650, bg="Black")
+        points.place(x=0, y=0)
+        
+        """
+        # Para reestablecer puntajes
         file = open("puntajes.txt", "wb")
         pickle.dump([0,0,0,0,0,0,0,0,0,0], file)
         file.close()
@@ -209,35 +208,41 @@ class MainMenu:
         top_10 = pickle.load(file)
         file.close()
 
-        no_1 = Label(points, text=top_10[9], bg="Black", fg="White")
-        no_1.place(x=10, y=10)
+        label1 = Label(points , text = "Hall of Fame" , font = ("Arial" , 24) , bg = "Black" , fg = "White")
+        label1.place(x = 400 , y = 30)
 
-        no_2 = Label(points, text=top_10[8], bg="Black", fg="White")
-        no_2.place(x=10, y=30)
+        no_1 = Label(points, text="1) " + str(top_10[9]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_1.place(x=30, y=100)
 
-        no_3 = Label(points, text=top_10[7], bg="Black", fg="White")
-        no_3.place(x=10, y=50)
+        no_2 = Label(points, text="2) " + str(top_10[8]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_2.place(x=30, y=150)
 
-        no_4 = Label(points, text=top_10[6], bg="Black", fg="White")
-        no_4.place(x=10, y=70)
+        no_3 = Label(points, text="3) " + str(top_10[7]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_3.place(x=30, y=200)
 
-        no_5 = Label(points, text=top_10[5], bg="Black", fg="White")
-        no_5.place(x=10, y=90)
+        no_4 = Label(points, text="4) " + str(top_10[6]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_4.place(x=30, y=250)
 
-        no_6 = Label(points, text=top_10[4], bg="Black", fg="White")
-        no_6.place(x=10, y=110)
+        no_5 = Label(points, text="5) " + str(top_10[5]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_5.place(x=30, y=300)
 
-        no_7 = Label(points, text=top_10[3], bg="Black", fg="White")
-        no_7.place(x=10, y=130)
+        no_6 = Label(points, text="6) " + str(top_10[4]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_6.place(x=30, y=350)
 
-        no_8 = Label(points, text=top_10[2], bg="Black", fg="White")
-        no_8.place(x=10, y=150)
+        no_7 = Label(points, text="7) " + str(top_10[3]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_7.place(x=30, y=400)
 
-        no_9 = Label(points, text=top_10[1], bg="Black", fg="White")
-        no_9.place(x=10, y=170)
+        no_8 = Label(points, text="8) " + str(top_10[2]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_8.place(x=30, y=450)
 
-        no_10 = Label(points, text=top_10[0], bg="Black", fg="White")
-        no_10.place(x=10, y=190)
+        no_9 = Label(points, text="9) " + str(top_10[1]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_9.place(x=30, y=500)
+
+        no_10 = Label(points, text="10) " + str(top_10[0]), font = ("Arial" , 16) , bg="Black", fg="White")
+        no_10.place(x=30, y=550)
+
+        go_back = Button(points , text="Main Menu", font="Arial", command=self.main_menu)
+        go_back.place(x=500, y=550)
 
 
 class Avatar:
@@ -286,9 +291,22 @@ class Obstacle:
                         [random.randint(260, 925), 10], [random.randint(260, 925), 575]]
         self.coords = random.choice(self.options)
         self.proyectile = self.level.create_image(self.coords[0], self.coords[1], image=self.proyectile_image , anchor = NW)
+        self.bouncer()
         self.animate()
         self.collision()
 
+    # Function that makes sure that all the projectiles move inside the map
+    def bouncer (self):
+        if self.coords[0] == 260 and self.x_speed < 0:
+            self.x_speed *= -1
+        if self.coords[0] == 925 and self.x_speed > 0:
+            self.x_speed *= -1
+        if self.coords[1] == 10 and self.y_speed < 0:
+            self.y_speed *= -1
+        if self.coords[1] == 575 and self.y_speed > 0:
+            self.y_speed *= -1
+
+    # Collision checker function
     def collision(self):
         global player_coords
         position = self.level.coords(self.proyectile)
@@ -344,14 +362,17 @@ class LevelCreation:
         self.name = name
 
         if level == 1:
-            self.speed_options = [-5 , -4 , -3 , -2 , -1 , 1 , 2 , 3 , 4 , 5]
-            self.projectile = 4
+            self.speed_options = [-5 , -4 , -3, 3 , 4 , 5]
+            self.projectile = 3
+            self.reward = 1
         if level == 2:
-            self.speed_options = [-6 , -5 , -4 , -3 , -2 , -1 , 1 , 2 , 3 , 4 , 5 , 6]
+            self.speed_options = [-6 , -5 , -4 , -3, 3 , 4 , 5 , 6]
             self.projectile = 2
+            self.reward = 3
         if level == 3:
-            self.speed_options = [-7 , -6 , -5 , -4 , -3 , -2 , -1 , 1 , 2 , 3 , 4 , 5 , 6 , 7]
+            self.speed_options = [-7 , -6 , -5 , -4 , -3, 3 , 4 , 5 , 6 , 7]
             self.projectile = 1
+            self.reward = 5
 
     def go_back_points(self): # Retorna al menu principal, y procesa el puntaje obtenido
         main_menu = MainMenu(self.window)
@@ -412,7 +433,7 @@ class LevelCreation:
         # Seconds Counter
         def counter():  
             self.seconds -= 1
-            self.points += 1
+            self.points += self.reward
             self.window.after(1000, counter)
 
         counter()
@@ -421,7 +442,7 @@ class LevelCreation:
         def creator():
             self.speed = random.choice(self.speed_options)
             proyectile = Obstacle(self.window, level_canvas, self.speed)
-            self.window.after(250 * self.projectile , creator)
+            self.window.after(300 * self.projectile , creator)
         
         creator()
 
