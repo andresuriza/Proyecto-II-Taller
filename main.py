@@ -43,12 +43,13 @@ class MainMenu:
     def __init__(self, place):
         self.window = place
         self.username = ""
-
-    mixer.music.load("menu_song.wav")
-    mixer.music.play(-1)  # loop
+        self.music = True
 
     # Main menu creation
     def main_menu(self):
+        mixer.music.load("menu_song.wav")
+        mixer.music.play(-1)  # loop
+
         main_menu = Canvas(self.window, width=1000, height=650, bg="Black")
         main_menu.place(x=0, y=0)
 
@@ -83,6 +84,17 @@ class MainMenu:
 
         hall_of_fame = Button(main_menu, font="Arial", text="Hall of Fame", command=self.hall_of_fame)
         hall_of_fame.place(x=445, y=560)
+
+        def music():
+            if self.music:
+                mixer.music.pause()
+                self.music = False
+            elif not self.music:
+                mixer.music.unpause()
+                self.music = True
+
+        music_control = Button(main_menu , text = "Mute/Unmute Music" , font = "Arial" , command = music)
+        music_control.place(x = 825 , y = 560)
 
         # Setting window as the mainloop
         self.window.mainloop()
@@ -190,9 +202,6 @@ class MainMenu:
         print(top_10)
         file.close()
 
-        self.hall_of_fame()
-
-    
     def hall_of_fame(self):
         points = Canvas(self.window , width=1000, height=650, bg="Black")
         points.place(x=0, y=0)
@@ -343,10 +352,7 @@ class Obstacle:
         else:
             self.level.delete(self.proyectile)
 
-
-
 # Level creation class
-
 
 class LevelCreation:
     def __init__(self, level, place , name):
@@ -360,6 +366,7 @@ class LevelCreation:
         self.lives = lives
         self.energy = energy
         self.name = name
+        self.game = True
 
         if level == 1:
             self.speed_options = [-5 , -4 , -3, 3 , 4 , 5]
@@ -374,13 +381,15 @@ class LevelCreation:
             self.projectile = 1
             self.reward = 5
 
-    def go_back_points(self): # Retorna al menu principal, y procesa el puntaje obtenido
+    # Retorna al menu principal, y procesa el puntaje obtenido
+    def go_back_points(self): 
+        self.game = False
         main_menu = MainMenu(self.window)
         main_menu.points(self.points)
         main_menu.main_menu()
         
-       
-    def interface(self):  # Define los elementos del nivel
+    # Define los elementos del nivel   
+    def interface(self): 
         level_canvas = Canvas(self.window, width=1000, height=650)
         level_canvas.place(x=0, y=0)
 
@@ -395,22 +404,23 @@ class LevelCreation:
         player = Avatar(self.window, ninja_pic, level_canvas)
 
         def UI():
-            if self.seconds == 0 or self.lives == 0:
-                self.go_back_points()
+            if self.game:
+                if self.seconds == 0 or self.lives == 0:
+                    self.go_back_points()
 
-            timer = Label(score_canvas, text=f"Time: {self.seconds}", font=("Arial", 16), bg="Black", fg="White", borderwidth=11)
-            timer.place(x=23, y=125)
+                timer = Label(score_canvas, text=f"Time: {self.seconds}", font=("Arial", 16), bg="Black", fg="White", borderwidth=11)
+                timer.place(x=23, y=125)
 
-            score = Label(score_canvas, text=f"Score: {self.points}", font=("Arial", 16), bg="Black", fg="White")
-            score.place(x=30, y=200)
+                score = Label(score_canvas, text=f"Score: {self.points}", font=("Arial", 16), bg="Black", fg="White")
+                score.place(x=30, y=200)
 
-            lives = Label(score_canvas , text= f"Player's Lives: {self.lives}" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
-            lives.place(x = 30 , y = 350)
+                lives = Label(score_canvas , text= f"Player's Lives: {self.lives}" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+                lives.place(x = 30 , y = 350)
 
-            energy = Label(score_canvas , text = f"Energy left: {self.energy}   " , font = ("Arial" , 16) , fg = "White" , bg = "Black")
-            energy.place(x = 30 , y = 425)
+                energy = Label(score_canvas , text = f"Energy left: {self.energy}   " , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+                energy.place(x = 30 , y = 425)
 
-            self.window.after(100, UI)
+                self.window.after(100, UI)
 
         UI()
 
@@ -427,34 +437,37 @@ class LevelCreation:
         username = Label(score_canvas , text = f"Username: {self.name}" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
         username.place(x = 30 , y = 275)
 
-        main_menu_button = Button(self.window, text="Go back", font=("Arial", 16), bg="White", fg="Black", command=self.go_back_points)
+        main_menu_button = Button(self.window, text="Main Menu", font=("Arial", 16), bg="White", fg="Black", command=self.go_back_points)
         main_menu_button.place(x=30, y=500)
 
         # Seconds Counter
-        def counter():  
-            self.seconds -= 1
-            self.points += self.reward
-            self.window.after(1000, counter)
+        def counter():
+            if self.game:  
+                self.seconds -= 1
+                self.points += self.reward
+                self.window.after(1000, counter)
 
         counter()
 
         # Projectile creator
         def creator():
-            self.speed = random.choice(self.speed_options)
-            proyectile = Obstacle(self.window, level_canvas, self.speed)
-            self.window.after(300 * self.projectile , creator)
+            if self.game:
+                self.speed = random.choice(self.speed_options)
+                proyectile = Obstacle(self.window, level_canvas, self.speed)
+                self.window.after(300 * self.projectile , creator)
         
         creator()
 
         # Lives and energy updates
         def update():
-            global lives, energy
-            self.lives = lives
-            self.energy = energy
-            if energy == 0:
-                lives -= 1
-                energy = 20
-            self.window.after(100 , update)
+            if self.game:
+                global lives, energy
+                self.lives = lives
+                self.energy = energy
+                if energy == 0:
+                    lives -= 1
+                    energy = 20
+                self.window.after(100 , update)
         
         update()
 
