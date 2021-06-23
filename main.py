@@ -22,6 +22,7 @@ pygame.init()
 player_coords = [0, 0]
 lives = 3
 energy = 20
+sound = True
 
 # ---------------------------------------------------------------------------Window class---------------------------------------------------------------------------------
 
@@ -43,7 +44,6 @@ class MainMenu:
     def __init__(self, place):
         self.window = place
         self.username = ""
-        self.music = True
 
     # Main menu creation
     def main_menu(self):
@@ -86,12 +86,13 @@ class MainMenu:
         hall_of_fame.place(x=445, y=560)
 
         def music():
-            if self.music:
+            global sound
+            if sound:
                 mixer.music.pause()
-                self.music = False
-            elif not self.music:
+                sound = False
+            elif not sound:
                 mixer.music.unpause()
-                self.music = True
+                sound = True
 
         music_control = Button(main_menu , text = "Mute/Unmute Music" , font = "Arial" , command = music)
         music_control.place(x = 825 , y = 560)
@@ -166,55 +167,17 @@ class MainMenu:
 
     # ----------------------------------------------------------------------------Hall of fame-------------------------------------------------------------------------------
 
-    def divide(self, list, i, j):  # Funcion que genera particiones mayores y menores de una lista a partir de un pivot
-        pivot = list[i]
-        left = i + 1
-        right = j
-
-        while left <= right:  # Mientras el puntero izquierdo este antes que el derecho
-            if list[left] < pivot:
-                left += 1
-            else:
-                if list[right] > pivot:
-                    right -= 1
-                else:
-                    list[left], list[right] = list[right], list[left]  # Se intercambian punteros
-                    left += 1
-                    right -= 1
-        list[i], list[right] = list[right], list[i]  # Se posiciona pivot
-        return right  # Retorna nueva posicion del pivot
-
-    def quicksort(self, list, start, end):  # Funcion que genera particiones de una lista hasta que quede ordenada
-        if start < end:  # Mientras puntero izquierdo este antes que el derecho (lista en total)
-            partition = self.divide(list, start, end)
-            self.quicksort(list, start, partition - 1)
-            self.quicksort(list, partition + 1, end)
-
-    def points(self, score):  # Funcion que lee los puntos en binario de un archivo .txt, los ordena y reescribe si necesario
-
-        file = open("puntajes.txt", "rb")
-        top_10 = pickle.load(file)
-        top_10.append(score)
-        file.close()
-        self.quicksort(top_10, 0, len(top_10) - 1)
-
-        file = open("puntajes.txt", "wb")
-        if len(top_10) > 10:  # Si los puntajes se exceden de 10, se recorta el menor
-            top_10 = top_10[1:]
-        pickle.dump(top_10, file)
-        print(top_10)
-        file.close()
-
     def hall_of_fame(self):
         points = Canvas(self.window , width=1000, height=650, bg="Black")
         points.place(x=0, y=0)
         
-        """
+        # txt reseting function
+        
         # Para reestablecer puntajes
         file = open("puntajes.txt", "wb")
         pickle.dump([0,0,0,0,0,0,0,0,0,0], file)
         file.close()
-        """
+        
 
         file = open("puntajes.txt", "rb")
         top_10 = pickle.load(file)
@@ -257,6 +220,7 @@ class MainMenu:
         go_back.place(x=500, y=550)
 
 
+# Avatar creating function
 class Avatar:
     def __init__(self, window, avatar_pic, level):
         self.avatar_pic = avatar_pic
@@ -291,6 +255,7 @@ class Avatar:
             self.level.move(self.avatar_pic, 0, 20)
 
 
+# Obstacle creating function
 class Obstacle:
     def __init__(self, window, level, speed):
         self.window = window
@@ -329,13 +294,15 @@ class Obstacle:
         if player_hitbox[0] < proyectile_hitbox[0] + proyectile_hitbox[2] and player_hitbox[0] + player_hitbox[2] > \
                 proyectile_hitbox[0] and player_hitbox[1] < proyectile_hitbox[1] + proyectile_hitbox[3] and \
                 player_hitbox[1] + player_hitbox[3] > proyectile_hitbox[1]:
-            global energy
-            hurt.play()
+            global energy , sound
+            if sound and lives > 0:
+                hurt.play()
             energy -= 1
             self.level.delete(self.proyectile)
         self.level.after(100, self.collision)
 
     def animate(self):  # Mueve a los proyectiles
+        global sound , lives
         shuriken = mixer.Sound("shuriken.wav")
 
         if self.counter != 2:
@@ -345,11 +312,13 @@ class Obstacle:
             if x >= 930 or x <= 250:
                 self.counter += 1
                 self.x_speed = -self.x_speed
-                shuriken.play()
+                if sound and lives > 0:
+                    shuriken.play()
             if y >= 580 or y <= 5:
                 self.counter += 1
                 self.y_speed = -self.y_speed
-                shuriken.play()
+                if sound and lives > 0:
+                    shuriken.play()
             self.level.move(self.proyectile, self.x_speed, self.y_speed)
             self.window.after(10, self.animate)
         else:
@@ -391,9 +360,9 @@ class LevelCreation:
     def go_back_points(self): 
         self.game = False
         mixer.music.pause()
-        main_menu = MainMenu(self.window)
-        main_menu.points(self.points)
-        main_menu.main_menu()
+        results = Results(self.lives , self.points , self.seconds , self.name , self.window)
+        results.points(self.points)
+        results.UI()
         
     # Define los elementos del nivel   
     def interface(self): 
@@ -449,6 +418,18 @@ class LevelCreation:
         main_menu_button = Button(self.window, text="Main Menu", font=("Arial", 16), bg="White", fg="Black", command=self.go_back_points)
         main_menu_button.place(x=30, y=500)
 
+        def music():
+            global sound
+            if sound:
+                mixer.music.pause()
+                sound = False
+            elif not sound:
+                mixer.music.unpause()
+                sound = True
+
+        music_control = Button(self.window , text = "Mute/Unmute Music" , font=("Arial", 16) , command = music)
+        music_control.place(x = 30 , y = 575)
+
         # Seconds Counter
         def counter():
             if self.game:  
@@ -482,15 +463,125 @@ class LevelCreation:
 
         level_canvas.mainloop()
 
-    """
-    Logica para sonido de herido
-
+# Result displaying section
+class Results:
+    def __init__(self , lives , points , time , name , window):
+            self.lives = lives
+            self.score = points
+            self.place = None
+            self.time = time
+            self.name = name
+            self.window = window
     
+    def divide(self, list, i, j):  # Funcion que genera particiones mayores y menores de una lista a partir de un pivot
+        pivot = list[i]
+        left = i + 1
+        right = j
 
-    Logica para sonido de shuriken rebotando con un borde
+        while left <= right:  # Mientras el puntero izquierdo este antes que el derecho
+            if list[left] < pivot:
+                left += 1
+            else:
+                if list[right] > pivot:
+                    right -= 1
+                else:
+                    list[left], list[right] = list[right], list[left]  # Se intercambian punteros
+                    left += 1
+                    right -= 1
+        list[i], list[right] = list[right], list[i]  # Se posiciona pivot
+        return right  # Retorna nueva posicion del pivot
 
-    
-    """
+    def quicksort(self, list, start, end):  # Funcion que genera particiones de una lista hasta que quede ordenada
+        if start < end:  # Mientras puntero izquierdo este antes que el derecho (lista en total)
+            partition = self.divide(list, start, end)
+            self.quicksort(list, start, partition - 1)
+            self.quicksort(list, partition + 1, end)
+
+    def points(self, score):  # Funcion que lee los puntos en binario de un archivo .txt, los ordena y reescribe si necesario
+
+        file = open("puntajes.txt", "rb")
+        top_10 = pickle.load(file)
+        top_10.append(score)
+        file.close()
+        self.quicksort(top_10, 0, len(top_10) - 1)
+
+        file = open("puntajes.txt", "wb")
+        if len(top_10) > 10:  # Si los puntajes se exceden de 10, se recorta el menor
+            top_10 = top_10[1:]
+        pickle.dump(top_10, file)
+        file.close()
+
+    def UI(self):
+        results = Canvas(self.window , width = 1000 , height = 650 , bg = "Black")
+        results.place(x = 0 , y = 0)
+
+        if self.lives == 0 and self.time > 0:
+            label1 = Label(results , text = "Game Over" , font = ("Arial" , 24) , fg = "White" , bg = "Black")
+            label1.place(x = 30 , y = 30)
+        
+        if self.time == 0 and self.lives >= 1:
+            label2  = Label(results , text = "Victory" , font = ("Arial" , 24) , fg = "White" , bg = "Black")
+            label2.place(x = 30 , y = 30)
+
+            def next_challenge():
+                if self.score == 60:
+                    level2 = LevelCreation(2, self.window , self.name)
+                    level2.interface()
+                if self.score == 180:
+                    level3 = LevelCreation(3, self.window , self.name)
+                    level3.interface()
+                if self.score == 300:
+                    main_menu = MainMenu(self.window)
+                    main_menu.main_menu()
+
+            next_level = Button(results , text = "Next Level" , font = ("Arial" , 16) , command = next_challenge)
+            next_level.place(x = 200 , y = 500)
+        
+        if self.time > 0 and self.lives > 0:
+            label3 = Label(results , text = "Game Interrupted" , font = ("Arial" , 24) , fg = "White" , bg = "Black")
+            label3.place(x = 30 , y = 30)
+
+        def go_back():
+            main_menu = MainMenu(self.window)
+            main_menu.main_menu()
+
+        main_menu = Button(results , text = "Main Menu" , font = ("Arial" , 16) , command = go_back)
+        main_menu.place(x = 30 , y = 500)
+        
+        file = open("puntajes.txt", "rb")
+        top_10 = pickle.load(file)
+        file.close()
+
+        i = 0
+        n = 9
+        place = 1
+        while n >= i:
+            if top_10[n] == self.score:
+                self.place = place
+                break
+            else:
+                n -= 1
+                place += 1
+
+        if self.place != None:
+            label4 = Label(results , text = "Congratulations!!!" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            label4.place(x = 30 , y = 100)
+
+            label4 = Label(results , text = "You've entered the Hall of Fame" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            label4.place(x = 30 , y = 130)
+
+            label5 = Label(results , text = "With a score of " + str(self.score) , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            label5.place(x = 30 , y = 160)
+
+            label6 = Label(results , text = "Now you have the position #" + str(self.place), font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            label6.place(x = 30 , y = 190)
+        
+        if self.place == None:
+            label7 = Label(results , text = "You have scored " + str(self.score) + " points" , font = ("Arial" , 16) , fg = "White" , bg = "Black")
+            label4.place(x = 30 , y = 100)
+        
+        results.mainloop()
+
 
 
 # Creating the window object
