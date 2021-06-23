@@ -174,10 +174,11 @@ class MainMenu:
         # txt reseting function
         
         # Para reestablecer puntajes
+        """
         file = open("puntajes.txt", "wb")
         pickle.dump([0,0,0,0,0,0,0,0,0,0], file)
         file.close()
-        
+        """
 
         file = open("puntajes.txt", "rb")
         top_10 = pickle.load(file)
